@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ OOP — Understand the Logic Behind Every Concept</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg-2: #111118;
+            --bg-3: #1a1a25;
+            --bg-4: #22222f;
+            --surface: #16161f;
+            --border: #252535;
+            --text: #e0e0ea;
+            --text-2: #a0a0b8;
+            --text-3: #6a6a80;
+            --accent: #6c5ce7;
+            --accent-2: #a78bfa;
+            --accent-glow: rgba(108, 92, 231, 0.25);
+            --green: #34d399;
+            --green-glow: rgba(52, 211, 153, 0.2);
+            --orange: #f59e0b;
+            --orange-glow: rgba(245, 158, 11, 0.2);
+            --red: #f87171;
+            --blue: #60a5fa;
+            --pink: #f472b6;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-lg: 20px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ─── Background Effects ─── */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.03;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 70%);
+        }
+        .bg-glow-1 {
+            position: fixed;
+            top: -20%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: floatG 12s ease-in-out infinite;
+        }
+        .bg-glow-2 {
+            position: fixed;
+            bottom: -15%;
+            right: -5%;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: floatG 15s ease-in-out infinite reverse;
+        }
+        @keyframes floatG {
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+            33% {
+                transform: translate(60px, -40px);
+            }
+            66% {
+                transform: translate(-30px, 30px);
+            }
+        }
+
+        /* ─── Layout ─── */
+        .app {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ─── Sidebar ─── */
+        .sidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            width: 260px;
+            min-width: 260px;
+            background: var(--bg-2);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            transition: transform var(--transition);
+        }
+        .sidebar-logo {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar-logo .icon {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .sidebar-logo span {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text);
+            letter-spacing: -0.3px;
+        }
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            color: var(--text-2);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 500;
+            transition: all var(--transition);
+            position: relative;
+        }
+        .sidebar-nav a:hover {
+            background: var(--bg-3);
+            color: var(--text);
+        }
+        .sidebar-nav a.active {
+            background: var(--bg-3);
+            color: var(--accent-2);
+            font-weight: 600;
+        }
+        .sidebar-nav a .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-3);
+            flex-shrink: 0;
+            transition: all var(--transition);
+        }
+        .sidebar-nav a.active .dot {
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+            width: 8px;
+            height: 8px;
+        }
+        .sidebar-nav .section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-3);
+            padding: 16px 14px 6px;
+            font-weight: 700;
+        }
+
+        /* ─── Main Content ─── */
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 0;
+        }
+        .content {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 40px 32px 80px;
+        }
+
+        /* ─── Hero ─── */
+        .hero {
+            padding: 60px 0 40px;
+            text-align: center;
+            position: relative;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.15;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff 20%, var(--accent-2) 50%, var(--accent) 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-2);
+            max-width: 560px;
+            margin: 0 auto 28px;
+            line-height: 1.6;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 50px;
+            background: var(--bg-3);
+            border: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-2);
+            margin-bottom: 20px;
+        }
+        .hero-badge .pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 var(--green-glow);
+            }
+            50% {
+                box-shadow: 0 0 0 12px transparent;
+            }
+        }
+
+        /* ─── Section Cards ─── */
+        .section-block {
+            margin: 32px 0;
+            border-radius: var(--radius-lg);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all var(--transition);
+        }
+        .section-block:hover {
+            border-color: #333348;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+        }
+        .section-header {
+            padding: 20px 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            gap: 12px;
+        }
+        .section-header h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            flex: 1;
+        }
+        .section-header .tag {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .tag-core {
+            background: var(--accent-glow);
+            color: var(--accent-2);
+        }
+        .tag-version {
+            background: var(--orange-glow);
+            color: var(--orange);
+        }
+        .tag-pattern {
+            background: var(--green-glow);
+            color: var(--green);
+        }
+        .section-body {
+            padding: 0 24px 24px;
+            display: none;
+        }
+        .section-block.open .section-body {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .section-header .arrow {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform var(--transition);
+            flex-shrink: 0;
+        }
+        .section-block.open .arrow {
+            transform: rotate(180deg);
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* ─── Problem/Solution Cards ─── */
+        .ps-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+        @media (max-width: 640px) {
+            .ps-card {
+                grid-template-columns: 1fr;
+            }
+        }
+        .ps-problem,
+        .ps-solution {
+            padding: 18px;
+            border-radius: var(--radius);
+            position: relative;
+            overflow: hidden;
+        }
+        .ps-problem {
+            background: #1a1018;
+            border: 1px solid #3d2028;
+        }
+        .ps-problem::before {
+            content: '⚠ PROBLEM';
+            display: block;
+            font-size: 10px;
+            letter-spacing: 1.2px;
+            color: var(--red);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .ps-solution {
+            background: #101a16;
+            border: 1px solid #1d3d2c;
+        }
+        .ps-solution::before {
+            content: '✓ SOLUTION';
+            display: block;
+            font-size: 10px;
+            letter-spacing: 1.2px;
+            color: var(--green);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .ps-problem p,
+        .ps-solution p {
+            font-size: 14px;
+            color: var(--text-2);
+            margin: 0;
+        }
+
+        /* ─── Code Blocks ─── */
+        .code-block {
+            background: #0d0d16;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 16px 0;
+            position: relative;
+        }
+        .code-block .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: var(--bg-3);
+            border-bottom: 1px solid var(--border);
+        }
+        .code-block .code-lang {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-2);
+            font-weight: 600;
+        }
+        .code-block .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-3);
+            padding: 4px 12px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all var(--transition);
+        }
+        .code-block .copy-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent-2);
+        }
+        .code-block pre {
+            padding: 16px;
+            margin: 0;
+            overflow-x: auto;
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1.6;
+            color: #c9d1d9;
+        }
+        .code-block code {
+            font-family: var(--mono);
+        }
+        /* Simple syntax highlighting */
+        .kw {
+            color: #c792ea;
+        }
+        .type {
+            color: #ffcb6b;
+        }
+        .fn {
+            color: #82aaff;
+        }
+        .str {
+            color: #c3e88d;
+        }
+        .num {
+            color: #f78c6c;
+        }
+        .cm {
+            color: #546e7a;
+            font-style: italic;
+        }
+        .op {
+            color: #89ddff;
+        }
+        .macro {
+            color: #bb80b3;
+        }
+
+        /* ─── Timeline ─── */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+            margin: 20px 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+            padding: 16px 20px;
+            background: var(--bg-2);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 22px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .timeline-item h4 {
+            font-size: 15px;
+            margin-bottom: 4px;
+            color: var(--accent-2);
+        }
+        .timeline-item .ver {
+            font-size: 11px;
+            color: var(--orange);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        .timeline-item p {
+            font-size: 13.5px;
+            color: var(--text-2);
+            margin: 0;
+        }
+
+        /* ─── Info Box ─── */
+        .info-box {
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            margin: 16px 0;
+            font-size: 14px;
+            border-left: 3px solid var(--accent);
+            background: var(--bg-2);
+            color: var(--text-2);
+        }
+        .info-box strong {
+            color: var(--text);
+        }
+        .info-box.tip {
+            border-left-color: var(--green);
+        }
+        .info-box.warning {
+            border-left-color: var(--orange);
+        }
+
+        /* ─── Table ─── */
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 13.5px;
+        }
+        .styled-table th {
+            text-align: left;
+            padding: 10px 14px;
+            background: var(--bg-2);
+            color: var(--text);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .styled-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-2);
+        }
+        .styled-table tr:hover td {
+            background: rgba(255, 255, 255, 0.015);
+            color: var(--text);
+        }
+        .styled-table .check {
+            color: var(--green);
+        }
+        .styled-table .cross {
+            color: var(--red);
+        }
+
+        /* ─── Keyword Grid ─── */
+        .kw-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .kw-card {
+            padding: 14px 16px;
+            background: var(--bg-2);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+        }
+        .kw-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+        .kw-card code {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--accent-2);
+            font-weight: 600;
+        }
+        .kw-card p {
+            font-size: 12px;
+            color: var(--text-3);
+            margin: 6px 0 0;
+        }
+
+        /* ─── Progress Bar ─── */
+        .progress-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            z-index: 100;
+            transition: width 0.15s ease;
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* ─── Back to Top ─── */
+        .back-top {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all var(--transition);
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        .back-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ─── Mobile Toggle ─── */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 60;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 18px;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                transform: translateX(-100%);
+                width: 280px;
+                z-index: 55;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: 8px 0 40px rgba(0, 0, 0, 0.6);
+            }
+            .mobile-toggle {
+                display: flex;
+            }
+            .content {
+                padding: 20px 16px 60px;
+            }
+            .ps-card {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            .kw-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+    <div class="bg-glow-1"></div>
+    <div class="bg-glow-2"></div>
+
+    <div class="progress-fixed" id="progressBar" style="width:0%"></div>
+
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">☰</button>
+    <button class="back-top" id="backTop" aria-label="Back to top">↑</button>
+
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="icon">++</div>
+                <span>C++ OOP</span>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav">
+                <a href="#intro" class="active"><span class="dot"></span> Introduction</a>
+                <span class="section-label">Core Concepts</span>
+                <a href="#classes"><span class="dot"></span> Classes & Objects</a>
+                <a href="#access"><span class="dot"></span> Access Specifiers</a>
+                <a href="#constructors"><span class="dot"></span> Constructors & Destructors</a>
+                <a href="#encapsulation"><span class="dot"></span> Encapsulation</a>
+                <a href="#inheritance"><span class="dot"></span> Inheritance</a>
+                <a href="#polymorphism"><span class="dot"></span> Polymorphism</a>
+                <a href="#abstract"><span class="dot"></span> Abstract & Interfaces</a>
+                <span class="section-label">Advanced</span>
+                <a href="#static"><span class="dot"></span> Static Members</a>
+                <a href="#const"><span class="dot"></span> Const & Mutable</a>
+                <a href="#friend"><span class="dot"></span> Friend</a>
+                <a href="#virtual-deep"><span class="dot"></span> Virtual — Deep Dive</a>
+                <a href="#operators"><span class="dot"></span> Operator Overloading</a>
+                <span class="section-label">Reference</span>
+                <a href="#lifecycle"><span class="dot"></span> Class Lifecycle</a>
+                <a href="#versions"><span class="dot"></span> C++ Version History</a>
+                <a href="#keywords"><span class="dot"></span> All Keywords</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main" id="mainContent">
+            <div class="content">
+
+                <!-- Hero -->
+                <section class="hero" id="intro">
+                    <div class="hero-badge"><span class="pulse"></span> Interactive Learning Guide</div>
+                    <h1>Understand C++ OOP<br>From the Inside Out</h1>
+                    <p>Every concept explained by starting with <strong>the problem it solves</strong> — so you
+                        understand not just <em>how</em>, but <em>why</em> it exists.</p>
+                </section>
+
+                <!-- Classes & Objects -->
+                <div class="section-block open" id="classes">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-core">CORE</span>
+                        <h2>1. Classes & Objects — Data + Behavior, Together</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="ps-card">
+                            <div class="ps-problem">
+                                <p>In C, <strong>structs</strong> hold data and <strong>functions</strong> operate on
+                                    them — but they're completely separate. Nothing stops you from passing garbage to a
+                                    function or forgetting to initialize a struct. The data and its operations are
+                                    strangers.</p>
+                            </div>
+                            <div class="ps-solution">
+                                <p>C++ introduces <strong>classes</strong>: a blueprint that bundles data
+                                    (<em>members</em>) and the functions that work on that data (<em>methods</em>)
+                                    together. An <strong>object</strong> is an instance of a class. Now a
+                                    <code>BankAccount</code> <em>knows</em> how to deposit — the logic lives with the
+                                    data.</p>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-header"><span class="code-lang">C++</span><button class="copy-btn"
+                                    onclick="copyCode(this)">Copy</button></div>
+                            <pre><code><span class="kw">class</span> <span class="type">Car</span> {
+<span class="kw">public</span>:
+    <span class="type">string</span> brand;
+    <span class="kw">int</span> speed;
+
+    <span class="kw">void</span> <span class="fn">drive</span>() {
+        cout &lt;&lt; brand &lt;&lt; <span class="str">" is driving at "</span> &lt;&lt; speed &lt;&lt; <span class="str">" km/h\n"</span>;
+    }
+};
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    Car c;              <span class="cm">// object created</span>
+    c.brand = <span class="str">"BMW"</span>;
+    c.speed = <span class="num">120</span>;
+    c.<span class="fn">drive</span>();         <span class="cm">// BMW is driving at 120 km/h</span>
+}</code></pre>
+                        </div>
+                        <div class="info-box tip">
+                            <strong>💡 The mental shift:</strong> Stop thinking "data + functions" and start thinking
+                            <em>"things that know how to do stuff"</em>. A <code>Dog</code> knows how to
+                            <code>bark()</code>. This is how humans already think about the world.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Access Specifiers -->
+                <div class="section-block" id="access">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-core">CORE</span>
+                        <h2>2. Access Specifiers — Who Can Touch What?</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="ps-card">
+                            <div class="ps-problem">
+                                <p>Once data and functions live together, <strong>anyone can still reach in and corrupt
+                                        the data</strong>: <code>account.balance = -99999;</code> — nothing stops this.
+                                    The class has rules (invariants) that can be broken from outside.</p>
+                            </div>
+                            <div class="ps-solution">
+                                <p>Access specifiers let the class <strong>control</strong> who sees what.
+                                    <code>private</code> members are only accessible inside the class itself.
+                                    <code>public</code> members form the safe, validated interface. The class
+                                    <em>guarantees</em> its invariants are maintained.</p>
+                            </div>
+                        </div>
+                        <table class="styled-table">
+                            <thead><tr><th>Specifier</th><th>Inside Class</th><th>Derived Class</th><th>Outside</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>public</code></td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+                                <tr><td><code>protected</code></td><td class="check">✓</td><td class="check">✓</td><td class="cross">✗</td></tr>
+                                <tr><td><code>private</code></td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="info-box">
+                            <strong>🔑 The real reason:</strong> Access control isn't about secrecy — it's about
+                            <strong>protecting invariants</strong>. A class has rules (e.g., balance ≥ 0). Making data
+                            private ensures those rules can't be broken by external code. You're protecting
+                            <em>correctness</em>, not hiding secrets.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Constructors & Destructors -->
+                <div class="section-block" id="constructors">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-core">CORE</span>
+                        <h2>3. Constructors & Destructors — Automatic Lifecycle Management</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="ps-card">
+                            <div class="ps-problem">
+                                <p>In C, you create a struct, then <strong>separately</strong> call an init function.
+                                    Forget to init → garbage data. Forget to free → memory leak. The creation and
+                                    cleanup are manual, error-prone, and disconnected from the object's lifetime.</p>
+                            </div>
+                            <div class="ps-solution">
+                                <p><strong>Constructors</strong> run automatically when an object is created.
+                                    <strong>Destructors</strong> run automatically when it's destroyed. You literally
+                                    cannot forget — the language guarantees it. This pattern is called
+                                    <strong>RAII</strong> (Resource Acquisition Is Initialization).</p>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-header"><span class="code-lang">C++</span><button class="copy-btn"
+                                    onclick="copyCode(this)">Copy</button></div>
+                            <pre><code><span class="kw">class</span> <span class="type">File</span> {
+    FILE* handle;
+<span class="kw">public</span>:
+    <span class="fn">File</span>(<span class="kw">const</span> <span class="kw">char</span>* name) {   <span class="cm">// Constructor — auto-called on creation</span>
+        handle = <span class="fn">fopen</span>(name, <span class="str">"r"</span>);
+    }
+    ~<span class="fn">File</span>() {                      <span class="cm">// Destructor — auto-called on destruction</span>
+        <span class="fn">fclose</span>(handle);
+    }
+};
+<span class="cm">// Usage: File opens automatically, closes when it goes out of scope</span>
+{
+    File <span class="fn">f</span>(<span class="str">"data.txt"</span>);   <span class="cm">// opened</span>
+    <span class="cm">// use f...</span>
+}                              <span class="cm">// closed automatically — CANNOT forget</span></code></pre>
+                        </div>
+                        <div class="info-box tip">
+                            <strong>💡 RAII is C++'s superpower:</strong> The constructor acquires resources. The
+                            destructor releases them. The <em>scope</em> of the object controls the <em>lifetime</em> of
+                            the resource. No garbage collector needed — deterministic, predictable, automatic.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Encapsulation -->
+                <div class="section-block" id="encapsulation">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-core">CORE</span>
+                        <h2>4. Encapsulation — The Black Box Philosophy</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <p style="font-size:15px;color:var(--text-2);margin-bottom:16px">Encapsulation isn't a keyword —
+                            it's the <strong>philosophy</strong> that emerges from <code>private</code> data + public
+                            methods. The class becomes a <strong>black box</strong>: interact through buttons (public
+                            methods), never reach inside and turn gears directly.</p>
+                        <div class="ps-card">
+                            <div class="ps-problem">
+                                <p><strong>Without encapsulation:</strong> Any code anywhere can modify
+                                    <code>balance</code>. If you later change how balance is stored internally (say from
+                                    <code>double</code> to <code>int cents</code>), <strong>every piece of code that
+                                        touched balance directly breaks</strong>.</p>
+                            </div>
+                            <div class="ps-solution">
+                                <p><strong>With encapsulation:</strong> Only the class touches <code>balance</code>.
+                                    External code uses <code>deposit()</code> and <code>getBalance()</code>. Change the
+                                    internal representation freely — <strong>nothing outside breaks</strong> because
+                                    nothing outside directly touched it.</p>
+                            </div>
+                        </div>
+                        <div class="info-box">
+                            <strong>🎯 The design goal:</strong> <em>Large private surface, small public surface.</em>
+                            The more you expose, the more you're locked into. The less you expose, the more freedom you
+                            have to change your implementation without breaking anything.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inheritance -->
+                <div class="section-block" id="inheritance">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-core">CORE</span>
+                        <h2>5. Inheritance — Reuse & Extend Through "IS-A"</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="ps-card">
+                            <div class="ps-problem">
+                                <p>You have <code>Car</code> and <code>Truck</code>. Both have
+                                    <code>brand</code>, <code>speed</code>, <code>start()</code>,
+                                    <code>stop()</code>. You're duplicating code. Worse — fix a bug in
+                                    <code>Car::start()</code> and you must also fix it in <code>Truck::start()</code>.
+                                    This doesn't scale.</p>
+                            </div>
+                            <div class="ps-solution">
+                                <p>Extract common parts into a <strong>base class</strong> (<code>Vehicle</code>).
+                                    <code>Car</code> and <code>Truck</code> <strong>inherit</strong> everything and only
+                                    define what's unique. One place to fix bugs. Clean "IS-A" relationships.</p>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-header"><span class="code-lang">C++</span><button class="copy-btn"
+                                    onclick="copyCode(this)">Copy</button></div>
+                            <pre><code><span class="kw">class</span> <span class="type">Vehicle</span> {          <span class="cm">// Base class</span>
+<span class="kw">public</span>:
+    <span class="type">string</span> brand;
+    <span class="kw">void</span> <span class="fn">start</span>() { cout &lt;&lt; <span class="str">"Starting...\n"</span>; }
+};
+
+<span class="kw">class</span> <span class="type">Car</span> : <span class="kw">public</span> <span class="type">Vehicle</span> {   <span class="cm">// Car IS-A Vehicle</span>
+<span class="kw">public</span>:
+    <span class="kw">int</span> numDoors;           <span class="cm">// only Cars have doors</span>
+};
+
+<span class="kw">class</span> <span class="type">Truck</span> : <span class="kw">public</span> <span class="type">Vehicle</span> { <span class="cm">// Truck IS-A Vehicle</span>
+<span class="kw">public</span>:
+    <span class="kw">double</span> cargoCapacity;   <span class="cm">// only Trucks have this</span>
+};</code></pre>
+                        </div>
+                        <div class="info-box warning">
+                            <strong>⚠️ Inheritance types matter:</strong> <code>public</code> inheritance = "IS-A" (most
+                            common). <code>protected</code>/<code>private</code> inheritance = "implemented-in-terms-of"
+                            (rare — prefer composition instead).
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Polymorphism -->
+                <div class="section-block" id="polymorphism">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-core">CORE</span>
+                        <h2>6. Polymorphism — One Interface, Many Behaviors</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="ps-card">
+                            <div class="ps-problem">
+                                <p>You have a collection of <strong>shapes</strong>. You want to call
+                                    <code>area()</code> on each. But at compile time, you don't know which shape you're
+                                    dealing with. Without polymorphism, the compiler always calls
+                                    <code>Shape::area()</code> — <strong>wrong</strong> for every actual shape.</p>
+                            </div>
+                            <div class="ps-solution">
+                                <p>Mark the function <code>virtual</code>. The compiler adds a hidden
+                                    <strong>vptr</strong> (virtual pointer) to every object, pointing to a
+                                    <strong>vtable</strong> of the object's actual functions. At runtime, the correct
+                                    function is dispatched — <strong>dynamic dispatch</strong>.</p>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-header"><span class="code-lang">C++</span><button class="copy-btn"
+                                    onclick="copyCode(this)">Copy</button></div>
+                            <pre><code><span class="kw">class</span> <span class="type">Shape</span> {
+<span class="kw">public</span>:
+    <span class="kw">virtual</span> <span class="kw">double</span> <span class="fn">area</span>() { <span class="kw">return</span> <span class="num">0</span>; }  <span class="cm">// virtual = can be overridden</span>
+    <span class="kw">virtual</span> ~<span class="fn">Shape</span>() {}                   <span class="cm">// virtual destructor — MANDATORY</span>
+};
+
+<span class="kw">class</span> <span class="type">Circle</span> : <span class="kw">public</span> <span class="type">Shape</span> {
+    <span class="kw">double</span> r;
+<span class="kw">public</span>:
+    <span class="kw">double</span> <span class="fn">area</span>() <span class="kw">override</span> { <span class="kw">return</span> <span class="num">3.14159</span> * r * r; }
+};
+
+<span class="kw">class</span> <span class="type">Rectangle</span> : <span class="kw">public</span> <span class="type">Shape</span> {
+    <span class="kw">double</span> w, h;
+<span class="kw">public</span>:
+    <span class="kw">double</span> <span class="fn">area</span>() <span class="kw">override</span> { <span class="kw">return</span> w * h; }
+};
+
+<span class="cm">// Runtime dispatch — the magic:</span>
+Shape* shapes[] = { <span class="kw">new</span> <span class="fn">Circle</span>(<span class="num">5</span>), <span class="kw">new</span> <span class="fn">Rectangle</span>(<span class="num">4</span>, <span class="num">6</span>) };
+<span class="kw">for</span> (<span class="kw">auto</span> s : shapes)
+    cout &lt;&lt; s-&gt;<span class="fn">area</span>() &lt;&lt; <span class="str">"\n"</span>;  <span class="cm">// calls the RIGHT area() at runtime!</span></code></pre>
+                        </div>
+                        <div class="info-box">
+                            <strong>🧠 How it works internally:</strong> Every object with virtual functions gets a
+                            hidden <code>vptr</code> (8 bytes on 64-bit). The vptr points to the class's
+                            <code>vtable</code> — an array of function pointers. When you call
+                            <code>s->area()</code>, the runtime follows <code>vptr → vtable → actual function</code>.
+                            One extra pointer dereference per call — negligible cost for enormous design flexibility.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Abstract Classes -->
+                <div class="section-block" id="abstract">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-core">CORE</span>
+                        <h2>7. Abstract Classes & Interfaces — Enforce a Contract</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="ps-card">
+                            <div class="ps-problem">
+                                <p><code>Shape</code> shouldn't define <code>area()</code> at all — a generic "shape"
+                                    has no area formula. But you want to <strong>enforce</strong> that every derived
+                                    class provides one. How do you say "you MUST implement this"?</p>
+                            </div>
+                            <div class="ps-solution">
+                                <p>Use <strong>pure virtual functions</strong> (<code>= 0</code>). The class becomes
+                                    <strong>abstract</strong> — uninstantiable. Every concrete subclass <em>must</em>
+                                    override every pure virtual function. This is C++'s way of doing
+                                    <strong>interfaces</strong>.</p>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-header"><span class="code-lang">C++</span><button class="copy-btn"
+                                    onclick="copyCode(this)">Copy</button></div>
+                            <pre><code><span class="kw">class</span> <span class="type">Shape</span> {                    <span class="cm">// Abstract — cannot instantiate</span>
+<span class="kw">public</span>:
+    <span class="kw">virtual</span> <span class="kw">double</span> <span class="fn">area</span>() = <span class="num">0</span>;         <span class="cm">// pure virtual = "you MUST implement this"</span>
+    <span class="kw">virtual</span> <span class="kw">void</span> <span class="fn">draw</span>() = <span class="num">0</span>;
+    <span class="kw">virtual</span> ~<span class="fn">Shape</span>() {}             <span class="cm">// virtual destructor</span>
+};
+
+<span class="cm">// Shape s;  ← ERROR: abstract class</span>
+
+<span class="kw">class</span> <span class="type">Circle</span> : <span class="kw">public</span> <span class="type">Shape</span> {
+    <span class="kw">double</span> r;
+<span class="kw">public</span>:
+    <span class="kw">double</span> <span class="fn">area</span>() <span class="kw">override</span> { <span class="kw">return</span> <span class="num">3.14</span> * r * r; }  <span class="cm">// MUST exist</span>
+    <span class="kw">void</span> <span class="fn">draw</span>() <span class="kw">override</span> { <span class="cm">/* render */</span> }          <span class="cm">// MUST exist</span>
+};</code></pre>
+                        </div>
+                        <div class="info-box tip">
+                            <strong>💡 Interfaces in C++:</strong> A class with <em>only</em> pure virtual functions is
+                            a pure interface. It defines a contract that implementors must fulfill. Write code that
+                            depends on the contract, not on any specific implementation.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Static -->
+                <div class="section-block" id="static">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-pattern">PATTERN</span>
+                        <h2>8. Static Members — Belongs to the Class, Not Objects</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="ps-card">
+                            <div class="ps-problem">
+                                <p>Some data genuinely belongs to the <strong>class</strong>, not to any individual
+                                    object. How many <code>Counter</code> objects exist right now? That's not per-object
+                                    data — it's class-wide data. Where do you put it?</p>
+                            </div>
+                            <div class="ps-solution">
+                                <p><code>static</code> members have <strong>one copy</strong> shared by all instances.
+                                    They exist even before any object is created. They live in static storage — not
+                                    inside any object's memory layout.</p>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-header"><span class="code-lang">C++</span><button class="copy-btn"
+                                    onclick="copyCode(this)">Copy</button></div>
+                            <pre><code><span class="kw">class</span> <span class="type">Counter</span> {
+    <span class="kw">static</span> <span class="kw">int</span> total;        <span class="cm">// ONE copy, shared by ALL objects</span>
+    <span class="kw">int</span> id;
+<span class="kw">public</span>:
+    <span class="fn">Counter</span>()  { total++; id = total; }
+    ~<span class="fn">Counter</span>() { total--; }
+    <span class="kw">static</span> <span class="kw">int</span> <span class="fn">getTotal</span>() { <span class="kw">return</span> total; }  <span class="cm">// no 'this' pointer</span>
+};
+<span class="kw">int</span> Counter::total = <span class="num">0</span>;   <span class="cm">// defined outside — lives in static storage</span>
+
+Counter a, b, c;
+cout &lt;&lt; Counter::<span class="fn">getTotal</span>();  <span class="cm">// 3 — called on the CLASS, not an object</span>
+<span class="kw">sizeof</span>(Counter);                <span class="cm">// only counts 'id' — total is not inside objects</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Const & Mutable -->
+                <div class="section-block" id="const">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-pattern">PATTERN</span>
+                        <h2>9. Const & Mutable — Promise Not to Change</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <p style="font-size:15px;color:var(--text-2);margin-bottom:16px"><code>const</code> means "I
+                            promise this won't change." The compiler enforces this promise. It appears in more positions
+                            than any other qualifier — variable, pointer, parameter, method, return type.</p>
+                        <div class="code-block">
+                            <div class="code-header"><span class="code-lang">C++</span><button class="copy-btn"
+                                    onclick="copyCode(this)">Copy</button></div>
+                        <pre><code><span class="cm">// Four pointer-const combinations (read right-to-left):</span>
+<span class="kw">int</span>* p1 = &amp;x;            <span class="cm">// pointer to int — both changeable</span>
+<span class="kw">const</span> <span class="kw">int</span>* p2 = &amp;x;       <span class="cm">// pointer to const int — value locked, pointer free</span>
+<span class="kw">int</span>* <span class="kw">const</span> p3 = &amp;x;       <span class="cm">// const pointer to int — pointer locked, value free</span>
+<span class="kw">const</span> <span class="kw">int</span>* <span class="kw">const</span> p4 = &amp;x;  <span class="cm">// const pointer to const int — both locked</span>
+
+<span class="cm">// Const member function — cannot modify the object:</span>
+<span class="kw">class</span> <span class="type">Circle</span> {
+    <span class="kw">double</span> radius;
+<span class="kw">public</span>:
+    <span class="kw">double</span> <span class="fn">getRadius</span>() <span class="kw">const</span> { <span class="kw">return</span> radius; }  <span class="cm">// const method — 'this' is const</span>
+    <span class="kw">void</span> <span class="fn">setRadius</span>(<span class="kw">double</span> r) { radius = r; }       <span class="cm">// non-const — can modify</span>
+};
+<span class="kw">const</span> Circle c(<span class="num">5.0</span>);
+c.<span class="fn">getRadius</span>();  <span class="cm">// OK</span>
+<span class="cm">// c.setRadius(3);  ← ERROR: non-const method on const object</span>
+
+<span class="cm">// mutable — escape hatch from const:</span>
+<span class="kw">class</span> <span class="type">Cache</span> {
+    <span class="kw">mutable</span> <span class="kw">bool</span> dirty = <span class="kw">true</span>;   <span class="cm">// can change even in const methods</span>
+    <span class="kw">mutable</span> <span class="kw">double</span> cachedVal;
+<span class="kw">public</span>:
+    <span class="kw">double</span> <span class="fn">getValue</span>() <span class="kw">const</span> {      <span class="cm">// logically const</span>
+        <span class="kw">if</span> (dirty) { cachedVal = <span class="fn">compute</span>(); dirty = <span class="kw">false</span>; }
+        <span class="kw">return</span> cachedVal;
+    }
+};</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Friend -->
+                <div class="section-block" id="friend">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-pattern">PATTERN</span>
+                        <h2>10. Friend — Controlled Access Exception</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="ps-card">
+                            <div class="ps-problem">
+                                <p>Sometimes a <strong>non-member function</strong> genuinely needs access to private
+                                    internals — like <code>operator&lt;&lt;</code> for stream output. It can't be a
+                                    member (the left side is <code>cout</code>, not your class), but it needs to read
+                                    private data.</p>
+                            </div>
+                            <div class="ps-solution">
+                                <p><code>friend</code> grants a specific external entity (function, method, or entire
+                                    class) full access to all private and protected members. The class itself declares
+                                    who it trusts — <strong>friendship is granted, not taken</strong>.</p>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-header"><span class="code-lang">C++</span><button class="copy-btn"
+                                    onclick="copyCode(this)">Copy</button></div>
+                            <pre><code><span class="kw">class</span> <span class="type">Point</span> {
+    <span class="kw">double</span> x, y;
+<span class="kw">public</span>:
+    <span class="cm">// operator&lt;&lt; is a FREE function but needs private access:</span>
+    <span class="kw">friend</span> ostream&amp; <span class="kw">operator</span>&lt;&lt;(ostream&amp; os, <span class="kw">const</span> Point&amp; p) {
+        <span class="kw">return</span> os &lt;&lt; <span class="str">"("</span> &lt;&lt; p.x &lt;&lt; <span class="str">", "</span> &lt;&lt; p.y &lt;&lt; <span class="str">")"</span>;
+    }
+};
+Point p{<span class="num">3.0</span>, <span class="num">4.0</span>};
+cout &lt;&lt; p;  <span class="cm">// prints: (3.0, 4.0)</span>
+
+<span class="cm">// Friend class — entire class gets access:</span>
+<span class="kw">class</span> <span class="type">TreeNode</span> {
+    <span class="kw">int</span> value;
+    TreeNode *left, *right;
+    <span class="kw">friend</span> <span class="kw">class</span> <span class="type">BinaryTree</span>;  <span class="cm">// BinaryTree can touch everything</span>
+};</code></pre>
+                        </div>
+                        <div class="info-box warning">
+                            <strong>⚠️ Friendship rules:</strong> Not inherited. Not transitive. Not symmetric. Use
+                            sparingly — it breaks encapsulation intentionally. Prefer making things public over
+                            friending when possible.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Virtual Deep Dive -->
+                <div class="section-block" id="virtual-deep">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-core">DEEP DIVE</span>
+                        <h2>11. Virtual Functions — The VTable Mechanism</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <p style="font-size:15px;color:var(--text-2);margin-bottom:16px">This is the crown jewel of OOP.
+                            Understanding <strong>how virtual actually works</strong> makes everything click.</p>
+                        <div class="info-box">
+                            <strong>🧠 Memory layout of a polymorphic object:</strong><br><br>
+                            <code>[ vptr ] → Dog's vtable: [ speak → Dog::speak, eat → Animal::eat, ... ]</code><br>
+                            <code>[ name ]</code> (inherited from Animal)<br>
+                            <code>[ breed ]</code> (Dog's own members)<br><br>
+                            Every class with virtual functions gets a <strong>vtable</strong>. Every object gets a
+                            <strong>vptr</strong> (8 bytes on 64-bit). When you call a virtual function, the runtime
+                            follows <code>vptr → vtable → actual function pointer</code>. One indirection = negligible
+                            cost.
+                        </div>
+                        <div class="info-box warning">
+                            <strong>⚠️ Why virtual destructor is MANDATORY:</strong> If you <code>delete</code> a
+                            <code>Shape*</code> that actually points to a <code>Circle</code>, and the destructor isn't
+                            virtual, only <code>Shape::~Shape()</code> runs. <code>Circle</code>'s destructor never
+                            runs → memory leak. <code>virtual ~Shape()</code> ensures the correct destructor chain
+                            through the vtable.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operator Overloading -->
+                <div class="section-block" id="operators">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-pattern">PATTERN</span>
+                        <h2>12. Operator Overloading — Natural Syntax for Your Types</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="ps-card">
+                            <div class="ps-problem">
+                                <p>User-defined types feel like second-class citizens:
+                                    <code>Vector v = add(v1, v2);</code> vs <code>int a = 1 + 2;</code>. Why can't
+                                    your types use natural operator syntax?</p>
+                            </div>
+                            <div class="ps-solution">
+                                <p>C++ lets you define what <code>+</code>, <code>==</code>, <code>[]</code>,
+                                    <code>()</code>, etc. mean for your types. You're not changing operators — you're
+                                    teaching them a new vocabulary. The operator's <em>concept</em> stays the same; only
+                                    the <em>implementation</em> changes.</p>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-header"><span class="code-lang">C++</span><button class="copy-btn"
+                                    onclick="copyCode(this)">Copy</button></div>
+                            <pre><code><span class="kw">class</span> <span class="type">Vector</span> {
+    <span class="kw">double</span> x, y;
+<span class="kw">public</span>:
+    Vector <span class="kw">operator</span>+(<span class="kw">const</span> Vector&amp; o) <span class="kw">const</span> { <span class="kw">return</span> {x+o.x, y+o.y}; }
+    Vector&amp; <span class="kw">operator</span>+=(<span class="kw">const</span> Vector&amp; o) { x+=o.x; y+=o.y; <span class="kw">return</span> *<span class="kw">this</span>; }
+    <span class="kw">bool</span> <span class="kw">operator</span>==(<span class="kw">const</span> Vector&amp; o) <span class="kw">const</span> { <span class="kw">return</span> x==o.x &amp;&amp; y==o.y; }
+    <span class="kw">double</span>&amp; <span class="kw">operator</span>[](<span class="kw">int</span> i) { <span class="kw">return</span> i==<span class="num">0</span> ? x : y; }
+    Vector <span class="kw">operator</span>-() <span class="kw">const</span> { <span class="kw">return</span> {-x, -y}; }  <span class="cm">// unary minus</span>
+};
+
+Vector v = v1 + v2;     <span class="cm">// natural!</span>
+v += v3;                <span class="cm">// natural!</span>
+<span class="kw">if</span> (v == v4) { }        <span class="cm">// natural!</span>
+cout &lt;&lt; v[<span class="num">0</span>];          <span class="cm">// array-like access</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Class Lifecycle -->
+                <div class="section-block" id="lifecycle">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-version">LIFECYCLE</span>
+                        <h2>13. Class Lifecycle — What Executes When</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="info-box">
+                            <strong>⏱️ Complete execution order for an object:</strong><br><br>
+                            <strong>1.</strong> Memory allocated (stack shift or heap malloc)<br>
+                            <strong>2.</strong> Base class constructors run (inheritance declaration order)<br>
+                            <strong>3.</strong> <strong>Member initializer list runs</strong> — in DECLARATION order
+                            (not list order!)<br>
+                            <strong>4.</strong> Constructor body <code>{}</code> executes<br>
+                            <strong>5.</strong> Object is fully alive ✓<br>
+                            <strong>6.</strong> ... object is used ...<br>
+                            <strong>7.</strong> Destructor body <code>{}</code> executes<br>
+                            <strong>8.</strong> Members destroyed in REVERSE declaration order<br>
+                            <strong>9.</strong> Base destructors run in REVERSE inheritance order<br>
+                            <strong>10.</strong> Memory freed
+                        </div>
+                        <div class="info-box tip">
+                            <strong>💡 Why the initializer list uses declaration order:</strong> Destruction must mirror
+                            construction. If construction order depended on the initializer list (which could vary per
+                            constructor), the destructor wouldn't know the order without storing it at runtime. By tying
+                            both to declaration order, the compiler guarantees they mirror without any runtime tracking.
+                        </div>
+                        <div class="info-box warning">
+                            <strong>⚠️ Priority for member initialization:</strong><br>
+                            1. Constructor initializer list (highest priority)<br>
+                            2. In-class member initializer (fallback, C++11+)<br>
+                            3. Default initialization (for primitives: garbage; for class types: default constructor)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Version History -->
+                <div class="section-block" id="versions">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-version">HISTORY</span>
+                        <h2>14. C++ Version Evolution — Why Each Feature Was Added</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <span class="ver">C++98/03</span>
+                                <h4>The Foundation — "How do we model real-world entities?"</h4>
+                                <p>Classes, inheritance, virtual functions, polymorphism, templates, RTTI, operator
+                                    overloading, namespaces. Everything you think of as "classic C++ OOP" lives here.
+                                </p>
+                            </div>
+                            <div class="timeline-item">
+                                <span class="ver">C++11</span>
+                                <h4>The Revolution — "How do we make this safe, fast, and less painful?"</h4>
+                                <p><code>override</code>/<code>final</code>, move semantics, smart pointers,
+                                    <code>auto</code>, lambdas, <code>constexpr</code>, <code>nullptr</code>,
+                                    delegating constructors, uniform initialization, <code>noexcept</code>,
+                                    <code>= default</code>/<code>= delete</code>. The biggest modernization in C++
+                                    history.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <span class="ver">C++14</span>
+                                <h4>The Polish — "Fix the rough edges we missed"</h4>
+                                <p>Generic lambdas, relaxed <code>constexpr</code>, return type deduction,
+                                    <code>[[deprecated]]</code>.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <span class="ver">C++17</span>
+                                <h4>Structural Completeness — "Fill gaps in the type system"</h4>
+                                <p>Structured bindings, <code>if constexpr</code>, <code>std::optional</code>,
+                                    <code>std::variant</code>, class template argument deduction (CTAD),
+                                    <code>[[nodiscard]]</code>, inline variables.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <span class="ver">C++20</span>
+                                <h4>The Second Revolution — "Constraints, async, and faster builds"</h4>
+                                <p>Concepts, coroutines, modules, ranges, spaceship operator <code>&lt;=&gt;</code>,
+                                    <code>consteval</code>, <code>constinit</code>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Keywords -->
+                <div class="section-block" id="keywords">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span class="tag tag-version">REFERENCE</span>
+                        <h2>15. Every Important Keyword — Quick Reference</h2>
+                        <div class="arrow">▾</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="kw-grid">
+                            <div class="kw-card"><code>static</code><p>One copy for the class; or internal linkage; or persistent local</p></div>
+                            <div class="kw-card"><code>extern</code><p>Defined elsewhere — linker resolves</p></div>
+                            <div class="kw-card"><code>friend</code><p>Grant private access to a specific entity</p></div>
+                            <div class="kw-card"><code>const</code><p>Promise not to change — enforced by compiler</p></div>
+                            <div class="kw-card"><code>mutable</code><p>Can change even inside const methods</p></div>
+                            <div class="kw-card"><code>virtual</code><p>Runtime dispatch via vtable</p></div>
+                            <div class="kw-card"><code>override</code><p>Verify this overrides a base virtual</p></div>
+                            <div class="kw-card"><code>final</code><p>No further overriding/inheritance</p></div>
+                            <div class="kw-card"><code>explicit</code><p>No implicit conversions allowed</p></div>
+                            <div class="kw-card"><code>inline</code><p>Multiple definitions are the same — keep one</p></div>
+                            <div class="kw-card"><code>constexpr</code><p>Evaluate at compile time</p></div>
+                            <div class="kw-card"><code>consteval</code><p>Must evaluate at compile time</p></div>
+                            <div class="kw-card"><code>constinit</code><p>Compile-time init, runtime mutable</p></div>
+                            <div class="kw-card"><code>noexcept</code><p>This function won't throw</p></div>
+                            <div class="kw-card"><code>volatile</code><p>Don't cache — hardware may change it</p></div>
+                            <div class="kw-card"><code>auto</code><p>Compiler deduces the type</p></div>
+                            <div class="kw-card"><code>decltype</code><p>Query the type of an expression</p></div>
+                            <div class="kw-card"><code>nullptr</code><p>Type-safe null pointer constant</p></div>
+                            <div class="kw-card"><code>this</code><p>Pointer to the current object</p></div>
+                            <div class="kw-card"><code>operator</code><p>Define behavior for built-in operators</p></div>
+                            <div class="kw-card"><code>= default</code><p>Request compiler-generated implementation</p></div>
+                            <div class="kw-card"><code>= delete</code><p>Explicitly prohibit this function</p></div>
+                            <div class="kw-card"><code>typename</code><p>This dependent name is a type</p></div>
+                            <div class="kw-card"><code>using</code><p>Type alias / inherit constructors / restore access</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <footer style="text-align:center;padding:40px 0 20px;color:var(--text-3);font-size:13px">
+                    <p>Built to help you <strong>feel the logic</strong> behind every C++ OOP concept.</p>
+                    <p style="margin-top:8px">Remember: every feature exists because <em>someone encountered a real
+                            problem</em>.</p>
+                </footer>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Toggle sections
+        function toggleSection(header) {
+            const block = header.parentElement;
+            block.classList.toggle('open');
+        }
+
+        // Copy code
+        function copyCode(btn) {
+            const pre = btn.closest('.code-block').querySelector('pre');
+            const text = pre.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = 'Copy', 1500);
+            });
+        }
+
+        // Progress bar
+        const progressBar = document.getElementById('progressBar');
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            progressBar.style.width = Math.min(progress, 100) + '%';
+        });
+
+        // Back to top
+        const backTop = document.getElementById('backTop');
+        window.addEventListener('scroll', () => {
+            backTop.classList.toggle('visible', window.scrollY > 500);
+        });
+        backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Mobile sidebar toggle
+        const mobileToggle = document.getElementById('mobileToggle');
+        const sidebar = document.getElementById('sidebar');
+        mobileToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+        document.getElementById('mainContent').addEventListener('click', () => {
+            if (window.innerWidth <= 768) sidebar.classList.remove('open');
+        });
+
+        // Active sidebar link
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(a => a.classList.remove('active'));
+                    const id = entry.target.id || entry.target.closest('[id]')?.id;
+                    if (id) {
+                        const link = document.querySelector(`.sidebar-nav a[href="#${id}"]`);
+                        if (link) link.classList.add('active');
+                    }
+                }
+            });
+        }, { rootMargin: '-40% 0px -55% 0px' });
+
+        document.querySelectorAll('.section-block[id], section[id]').forEach(el => observer.observe(el));
+
+        // Close sidebar on nav click (mobile)
+        navLinks.forEach(a => {
+            a.addEventListener('click', () => {
+                if (window.innerWidth <= 768) sidebar.classList.remove('open');
+            });
+        });
+    </script>
+</body>
+</html>
